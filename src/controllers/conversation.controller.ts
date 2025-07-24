@@ -1,16 +1,15 @@
-import { generateText } from 'ai';
 import { google } from '@ai-sdk/google';
+import { generateText } from 'ai';
 
-import { env } from '@/configs';
 import { db } from '@/db/drizzle';
 import { createAuthRouter } from '@/lib';
 import {
+  addMessageToHistory,
   createConversation,
   deleteConversation,
   getConversation,
   getConversationHistory,
   getListConversation,
-  addMessageToHistory,
 } from '@/repositories/conversation.repository';
 import {
   createConversationRoute,
@@ -67,11 +66,18 @@ conversationProtectedRouter.openapi(sendMessageRoute, async (c) => {
     // First, verify the conversation exists and belongs to the user
     const conversationResult = await getConversation(db, conversationId, user);
     if (!conversationResult.success || !conversationResult.data) {
-      return c.json(conversationResult, (conversationResult.code as unknown) ?? 400);
+      return c.json(
+        conversationResult,
+        (conversationResult.code as unknown) ?? 400,
+      );
     }
 
     // Get conversation history for context
-    const historyResult = await getConversationHistory(db, conversationId, user);
+    const historyResult = await getConversationHistory(
+      db,
+      conversationId,
+      user,
+    );
     if (!historyResult.success || !historyResult.data) {
       return c.json(historyResult, (historyResult.code as unknown) ?? 400);
     }
@@ -82,20 +88,25 @@ conversationProtectedRouter.openapi(sendMessageRoute, async (c) => {
       conversationId,
       'user',
       message,
-      user
+      user,
     );
 
     if (!userMessageResult.success) {
-      return c.json(userMessageResult, (userMessageResult.code as unknown) ?? 400);
+      return c.json(
+        userMessageResult,
+        (userMessageResult.code as unknown) ?? 400,
+      );
     }
 
     // Prepare conversation context for AI
     const studyKit = conversationResult.data.studyKit;
     const conversationHistory = historyResult.data;
-    
+
     // Build context from conversation history
     const messageHistory = conversationHistory.map((msg) => ({
-      role: (msg.speaker === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+      role: (msg.speaker === 'user' ? 'user' : 'assistant') as
+        | 'user'
+        | 'assistant',
       content: msg.messageText,
     }));
 
@@ -120,7 +131,7 @@ Buatlah respon yang ringkas namun informatif.`;
       system: systemPrompt,
       messages: [
         ...messageHistory.slice(-10), // Keep last 10 messages for context
-        { role: 'user', content: message }
+        { role: 'user', content: message },
       ],
       temperature: 0.7,
       maxTokens: 1000,
@@ -132,7 +143,7 @@ Buatlah respon yang ringkas namun informatif.`;
       conversationId,
       'assistant',
       aiResponse,
-      user
+      user,
     );
 
     if (!aiMessageResult.success) {
@@ -140,24 +151,29 @@ Buatlah respon yang ringkas namun informatif.`;
     }
 
     // Return the AI response
-    return c.json({
-      success: true,
-      message: 'Message sent successfully',
-      data: {
-        message: aiResponse,
-        conversationId,
+    return c.json(
+      {
+        success: true,
+        message: 'Message sent successfully',
+        data: {
+          message: aiResponse,
+          conversationId,
+        },
+        code: 200,
       },
-      code: 200,
-    }, 200);
-
+      200,
+    );
   } catch (error) {
     console.error('Error in AI conversation:', error);
-    return c.json({
-      success: false,
-      message: 'Failed to process message',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      code: 500,
-    }, 500);
+    return c.json(
+      {
+        success: false,
+        message: 'Failed to process message',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        code: 500,
+      },
+      500,
+    );
   }
 });
 
@@ -167,4 +183,4 @@ conversationProtectedRouter.openapi(deleteConversationRoute, async (c) => {
   const user = c.var.user;
   const res = await deleteConversation(db, params.id, user);
   return c.json(res, (res.code as unknown) ?? 200);
-}); 
+});

@@ -2,9 +2,9 @@ import { and, eq } from 'drizzle-orm';
 
 import { first } from '@/db/db-helper';
 import { Database } from '@/db/drizzle';
-import { conversations, conversationHistory, studyKits } from '@/db/schema';
+import { conversationHistory, conversations, studyKits } from '@/db/schema';
+import { CreateConversation } from '@/types/conversation.type';
 import { SessionUser } from '@/types/session.type';
-import { CreateConversation, CreateConversationHistory } from '@/types/conversation.type';
 
 export const createConversation = async (
   db: Database,
@@ -95,7 +95,7 @@ export const getConversation = async (
     const conversation = await db.query.conversations.findFirst({
       where: and(
         eq(conversations.id, conversationId),
-        eq(conversations.userId, user.id)
+        eq(conversations.userId, user.id),
       ),
       with: {
         studyKit: {
@@ -142,7 +142,7 @@ export const getConversationHistory = async (
     const conversation = await db.query.conversations.findFirst({
       where: and(
         eq(conversations.id, conversationId),
-        eq(conversations.userId, user.id)
+        eq(conversations.userId, user.id),
       ),
     });
 
@@ -156,7 +156,9 @@ export const getConversationHistory = async (
 
     const history = await db.query.conversationHistory.findMany({
       where: eq(conversationHistory.conversationId, conversationId),
-      orderBy: (conversationHistory, { asc }) => [asc(conversationHistory.timestamp)],
+      orderBy: (conversationHistory, { asc }) => [
+        asc(conversationHistory.timestamp),
+      ],
     });
 
     return {
@@ -188,7 +190,7 @@ export const addMessageToHistory = async (
     const conversation = await db.query.conversations.findFirst({
       where: and(
         eq(conversations.id, conversationId),
-        eq(conversations.userId, user.id)
+        eq(conversations.userId, user.id),
       ),
     });
 
@@ -242,10 +244,12 @@ export const deleteConversation = async (
   try {
     const result = await db
       .delete(conversations)
-      .where(and(
-        eq(conversations.id, conversationId),
-        eq(conversations.userId, user.id)
-      ))
+      .where(
+        and(
+          eq(conversations.id, conversationId),
+          eq(conversations.userId, user.id),
+        ),
+      )
       .returning()
       .then(first);
 
@@ -271,4 +275,4 @@ export const deleteConversation = async (
       code: 500,
     };
   }
-}; 
+};
