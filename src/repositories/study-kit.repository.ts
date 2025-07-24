@@ -1,0 +1,194 @@
+import { and, eq } from 'drizzle-orm';
+
+import { first } from '@/db/db-helper';
+import { Database } from '@/db/drizzle';
+import { studyKitGroups, studyKits } from '@/db/schema';
+import { SessionUser } from '@/types/session.type';
+import { CreateStudyKit, UpdateStudyKit } from '@/types/study-kit.type';
+
+export const createStudyKit = async (
+  db: Database,
+  body: CreateStudyKit,
+  user: SessionUser,
+) => {
+  try {
+    const { groupId, title, description } = body;
+    const { id: userId } = user;
+
+    // find group to ensure it exists
+    const groupExists = await db
+      .select()
+      .from(studyKitGroups)
+      .where(
+        and(eq(studyKitGroups.id, groupId), eq(studyKitGroups.userId, userId)),
+      )
+      .then(first);
+
+    if (!groupExists) {
+      return {
+        success: false,
+        message: 'Group not found',
+        code: 404,
+      };
+    }
+
+    await db.insert(studyKits).values({
+      userId,
+      groupId,
+      title,
+      description,
+    });
+
+    return {
+      success: true,
+      message: 'Study Kit created successfully',
+      code: 201,
+    };
+  } catch (error) {
+    console.error('Error creating Study Kit:', error);
+    return {
+      success: false,
+      message: 'Failed to create Study Kit',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: 500,
+    };
+  }
+};
+
+export const getListStudyKit = async (db: Database, user: SessionUser) => {
+  try {
+    const kits = await db
+      .select()
+      .from(studyKits)
+      .where(eq(studyKits.userId, user.id));
+
+    return {
+      success: true,
+      message: 'Study Kits fetched successfully',
+      data: kits,
+      code: 200,
+    };
+  } catch (error) {
+    console.error('Error fetching Study Kits:', error);
+    return {
+      success: false,
+      message: 'Failed to fetch Study Kits',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: 500,
+    };
+  }
+};
+
+export const getStudyKit = async (
+  db: Database,
+  kitId: string,
+  user: SessionUser,
+) => {
+  try {
+    const kit = await db
+      .select()
+      .from(studyKits)
+      .where(and(eq(studyKits.id, kitId), eq(studyKits.userId, user.id)))
+      .then(first);
+
+    if (!kit) {
+      return {
+        success: false,
+        message: 'Study Kit not found',
+        code: 404,
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Study Kit fetched successfully',
+      data: kit,
+      code: 200,
+    };
+  } catch (error) {
+    console.error('Error fetching Study Kit:', error);
+    return {
+      success: false,
+      message: 'Failed to fetch Study Kit',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: 500,
+    };
+  }
+};
+
+export const updateStudyKit = async (
+  db: Database,
+  kitId: string,
+  body: UpdateStudyKit,
+  user: SessionUser,
+) => {
+  try {
+    const { title, groupId, description } = body;
+    const { id: userId } = user;
+
+    const result = await db
+      .update(studyKits)
+      .set({ title, groupId, description })
+      .where(and(eq(studyKits.id, kitId), eq(studyKits.userId, userId)))
+      .returning()
+      .then(first);
+
+    if (!result) {
+      return {
+        success: false,
+        message: 'Study Kit not found or no changes made',
+        code: 404,
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Study Kit updated successfully',
+      code: 200,
+    };
+  } catch (error) {
+    console.error('Error updating Study Kit:', error);
+    return {
+      success: false,
+      message: 'Failed to update Study Kit',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: 500,
+    };
+  }
+};
+
+export const deleteStudyKit = async (
+  db: Database,
+  kitId: string,
+  user: SessionUser,
+) => {
+  try {
+    const result = await db
+      .delete(studyKits)
+      .where(and(eq(studyKits.id, kitId), eq(studyKits.userId, user.id)))
+      .returning()
+      .then(first);
+
+    if (!result) {
+      return {
+        success: false,
+        message: 'Study Kit not found',
+        code: 404,
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Study Kit deleted successfully',
+      code: 200,
+    };
+  } catch (error) {
+    console.error('Error deleting Study Kit:', error);
+    return {
+      success: false,
+      message: 'Failed to delete Study Kit',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: 500,
+    };
+  }
+};

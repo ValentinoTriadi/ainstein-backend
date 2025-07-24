@@ -3,7 +3,10 @@ import { z } from 'zod';
 import { genericSchema } from '@/types/generic.type';
 
 // Factory function to create extended response schema with data
-export function createResponseSchema<T extends z.ZodType>(dataSchema: T) {
+export function createResponseSchema<T extends z.ZodType>(dataSchema?: T) {
+  if (!dataSchema) {
+    return genericSchema;
+  }
   return genericSchema.extend({
     data: dataSchema.optional(),
   });

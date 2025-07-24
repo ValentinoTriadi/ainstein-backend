@@ -18,7 +18,14 @@ export const authMiddleware = () => {
     if (!session) {
       c.set('user', null);
       c.set('session', null);
-      return next();
+      return c.json(
+        {
+          success: false,
+          message: 'Unauthorized',
+          code: 401,
+        },
+        401,
+      );
     }
 
     c.set('user', session.user);
