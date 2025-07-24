@@ -10,10 +10,10 @@ export const conversations = pgTable('conversations', {
   id: varchar('id').primaryKey().unique().$defaultFn(createId),
   studyKitId: varchar('study_kit_id')
     .notNull()
-    .references(() => studyKits.id),
+    .references(() => studyKits.id, { onDelete: 'cascade' }),
   userId: varchar('user_id')
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: 'cascade' }),
   startedAt: timestamp('started_at').notNull().defaultNow(),
   lastUpdated: timestamp('last_updated').notNull().defaultNow(),
 });
@@ -33,7 +33,7 @@ export const conversationHistory = pgTable('conversation_history', {
   id: varchar('id').primaryKey().unique().$defaultFn(createId),
   conversationId: varchar('conversation_id')
     .notNull()
-    .references(() => conversations.id),
+    .references(() => conversations.id, { onDelete: 'cascade' }),
   speaker: varchar('speaker').notNull(),
   messageText: text('message_text').notNull(),
   timestamp: timestamp('timestamp').notNull().defaultNow(),

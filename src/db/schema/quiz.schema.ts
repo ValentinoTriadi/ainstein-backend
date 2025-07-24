@@ -15,7 +15,7 @@ export const quizzes = pgTable('quizzes', {
   id: varchar('id').primaryKey().unique().$defaultFn(createId),
   studyKitId: varchar('study_kit_id')
     .notNull()
-    .references(() => studyKits.id),
+    .references(() => studyKits.id, { onDelete: 'cascade' }),
   title: varchar('title').notNull(),
   description: text('description'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -32,7 +32,7 @@ export const quizQuestions = pgTable('quiz_questions', {
   id: varchar('id').primaryKey().unique().$defaultFn(createId),
   quizId: varchar('quiz_id')
     .notNull()
-    .references(() => quizzes.id),
+    .references(() => quizzes.id, { onDelete: 'cascade' }),
   questionText: text('question_text').notNull(),
   questionType: varchar('question_type').notNull(),
 });
@@ -48,7 +48,7 @@ export const quizAnswers = pgTable('quiz_answers', {
   id: varchar('id').primaryKey().unique().$defaultFn(createId),
   questionId: varchar('question_id')
     .notNull()
-    .references(() => quizQuestions.id),
+    .references(() => quizQuestions.id, { onDelete: 'cascade' }),
   answerText: text('answer_text').notNull(),
   isCorrect: boolean('is_correct').default(false),
 });

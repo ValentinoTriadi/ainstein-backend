@@ -9,7 +9,7 @@ export const flashcards = pgTable('flashcards', {
   id: varchar('id').primaryKey().unique().$defaultFn(createId),
   studyKitId: varchar('study_kit_id')
     .notNull()
-    .references(() => studyKits.id),
+    .references(() => studyKits.id, { onDelete: 'cascade' }),
   frontText: text('front_text').notNull(),
   backText: text('back_text').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),

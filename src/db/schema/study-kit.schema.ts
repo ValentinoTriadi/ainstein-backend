@@ -15,7 +15,7 @@ export const studyKitGroups = pgTable('study_kit_groups', {
   id: varchar('id').primaryKey().unique().$defaultFn(createId),
   userId: varchar('user_id')
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: 'cascade' }),
   name: varchar('name').notNull(),
   description: text('description'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -35,10 +35,10 @@ export const studyKits = pgTable(
     id: varchar('id').notNull().unique().$defaultFn(createId),
     groupId: varchar('group_id')
       .notNull()
-      .references(() => studyKitGroups.id),
+      .references(() => studyKitGroups.id, { onDelete: 'cascade' }),
     userId: varchar('user_id')
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: 'cascade' }),
     title: varchar('title').notNull(),
     description: text('description'),
     createdAt: timestamp('created_at').notNull().defaultNow(),

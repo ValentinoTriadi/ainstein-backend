@@ -8,6 +8,27 @@
       "when": 1753349574664,
       "tag": "0000_steep_nighthawk",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753356752172,
+      "tag": "0001_small_psylocke",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753357157247,
+      "tag": "0002_loose_martin_li",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1753358026226,
+      "tag": "0003_ambitious_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

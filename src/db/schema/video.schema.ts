@@ -16,19 +16,20 @@ import { user } from './user.schema';
 // Videos
 export const videos = pgTable('videos', {
   id: varchar('id').primaryKey().unique().$defaultFn(createId),
-  studyKitId: varchar('study_kit_id').references(() => studyKits.id),
+  studyKitId: varchar('study_kit_id')
+    .notNull()
+    .references(() => studyKits.id, { onDelete: 'cascade' }),
   userId: varchar('user_id')
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: 'cascade' }),
   title: varchar('title').notNull(),
   url: varchar('url').notNull(),
   description: text('description'),
   like: integer('like').default(0),
-  durationSeconds: integer('duration_seconds'),
   uploadedAt: timestamp('uploaded_at').notNull().defaultNow(),
 });
 
-export const videosRelations = relations(videos, ({ one }) => ({
+export const videosRelations = relations(videos, ({ one, many }) => ({
   studyKit: one(studyKits, {
     fields: [videos.studyKitId],
     references: [studyKits.id],
@@ -37,6 +38,8 @@ export const videosRelations = relations(videos, ({ one }) => ({
     fields: [videos.userId],
     references: [user.id],
   }),
+  likes: many(videoLikes),
+  comments: many(videosComments),
 }));
 
 // Video Likes
@@ -45,10 +48,10 @@ export const videoLikes = pgTable(
   {
     videoId: varchar('video_id')
       .notNull()
-      .references(() => videos.id),
+      .references(() => videos.id, { onDelete: 'cascade' }),
     userId: varchar('user_id')
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: 'cascade' }),
     likedAt: timestamp('liked_at').notNull().defaultNow(),
   },
   (table) => ({
@@ -69,18 +72,17 @@ export const videoLikesRelations = relations(videoLikes, ({ one }) => ({
 }));
 
 // Video Comments
-export const videosComments = pgTable(
-  'videos_comments',
-  {
-    id: varchar('id').primaryKey().unique().$defaultFn(createId),
-    videoId: varchar('video_id').references(() => videos.id),
-    userId: varchar('user_id').references(() => user.id),
-    comment: varchar('comment').notNull(),
-  },
-  (table) => ({
-    uniqueIdx: unique().on(table.videoId, table.userId),
-  }),
-);
+export const videosComments = pgTable('videos_comments', {
+  id: varchar('id').primaryKey().unique().$defaultFn(createId),
+  videoId: varchar('video_id')
+    .notNull()
+    .references(() => videos.id, { onDelete: 'cascade' }),
+  userId: varchar('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  comment: varchar('comment').notNull(),
+  createdAt: timestamp('liked_at').notNull().defaultNow(),
+});
 
 export const videosCommentsRelations = relations(videosComments, ({ one }) => ({
   video: one(videos, {

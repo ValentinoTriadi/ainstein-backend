@@ -1,0 +1,1 @@
+ALTER TABLE "videos_comments" DROP CONSTRAINT "videos_comments_video_id_user_id_unique";

@@ -5,3 +5,7 @@ export const genericSchema = z.object({
   message: z.string(),
   code: z.number().default(200),
 });
+
+export const idParamsSchema = z.object({
+  id: z.string(),
+});
