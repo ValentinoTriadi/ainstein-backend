@@ -1,5 +1,4 @@
 import { and, eq } from 'drizzle-orm';
-
 import { firstSure } from '@/db/db-helper';
 import { Database } from '@/db/drizzle';
 import { quizAnswers, quizQuestions, quizzes, studyKits } from '@/db/schema';
@@ -13,6 +12,92 @@ import {
 } from '@/types/quiz.type';
 import { SessionUser } from '@/types/session.type';
 
+// Types for AI-generated quiz creation
+export interface QuizData {
+  title: string;
+  description?: string;
+  questions: QuestionData[];
+}
+
+export interface QuestionData {
+  questionText: string;
+  questionType: string;
+  answers: AnswerData[];
+}
+
+export interface AnswerData {
+  answerText: string;
+  isCorrect: boolean;
+}
+
+// AI-powered quiz creation
+export const createQuizFromAI = async (
+  db: Database,
+  studyKitId: string,
+  quizData: QuizData,
+  user: SessionUser,
+) => {
+  try {
+    const { id: userId } = user;
+    const { title, description, questions } = quizData;
+
+    return await db.transaction(async (tx) => {
+      // Create the quiz
+      const [newQuiz] = await tx
+        .insert(quizzes)
+        .values({
+          studyKitId,
+          title,
+          description,
+        })
+        .returning();
+
+      // Create questions and answers
+      for (const questionData of questions) {
+        const [newQuestion] = await tx
+          .insert(quizQuestions)
+          .values({
+            quizId: newQuiz.id,
+            questionText: questionData.questionText,
+            questionType: questionData.questionType,
+          })
+          .returning();
+
+        // Create answers for this question
+        if (questionData.answers && questionData.answers.length > 0) {
+          await tx.insert(quizAnswers).values(
+            questionData.answers.map((answer) => ({
+              questionId: newQuestion.id,
+              answerText: answer.answerText,
+              isCorrect: answer.isCorrect,
+            }))
+          );
+        }
+      }
+
+      return {
+        success: true,
+        message: 'Quiz created successfully',
+        data: {
+          quizId: newQuiz.id,
+          title: newQuiz.title,
+          questionCount: questions.length,
+        },
+        code: 201,
+      };
+    });
+  } catch (error) {
+    console.error('Error creating AI-generated quiz:', error);
+    return {
+      success: false,
+      message: 'Failed to create quiz',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: 500,
+    };
+  }
+};
+
+// CRUD logic for quizzes
 export const createQuiz = async (db: Database, body: CreateQuiz) => {
   try {
     const { title, description, questions, studyKitId } = body;
