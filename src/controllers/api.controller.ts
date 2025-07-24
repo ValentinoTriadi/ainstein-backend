@@ -1,5 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 
+import { conversationProtectedRouter } from './conversation.controller';
 import { healthRouter, protectedHealthRouter } from './health.controller';
 import { studyKitGroupProtectedRouter } from './study-kit-group.controller';
 import { studyKitProtectedRouter } from './study-kit.controller';
@@ -13,6 +14,7 @@ protectedRouter.route('/', protectedHealthRouter);
 protectedRouter.route('/', studyKitGroupProtectedRouter);
 protectedRouter.route('/', studyKitProtectedRouter);
 protectedRouter.route('/', videoProtectedRouter);
+protectedRouter.route('/', conversationProtectedRouter);
 
 export const apiRouter = new OpenAPIHono();
 apiRouter.route('/', unprotectedRouter);
