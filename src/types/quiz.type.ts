@@ -71,6 +71,14 @@ export const quizQuestionIdParamsSchema = z.object({
   quizId: z.string(),
   questionId: z.string(),
 });
+export const quizAnswerIdParamsSchema = z.object({
+  quizId: z.string(),
+  questionId: z.string(),
+  answerId: z.string(),
+});
+
+export type QuizQuestionIdParams = z.infer<typeof quizQuestionIdParamsSchema>;
+export type QuizAnswerIdParams = z.infer<typeof quizAnswerIdParamsSchema>;
 
 // TYPES
 export type Quiz = z.infer<typeof quizSchema>;

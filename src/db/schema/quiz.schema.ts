@@ -20,11 +20,12 @@ export const quizzes = pgTable('quizzes', {
   description: text('description'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
-export const quizzesRelations = relations(quizzes, ({ one }) => ({
+export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   studyKit: one(studyKits, {
     fields: [quizzes.studyKitId],
     references: [studyKits.id],
   }),
+  quizQuestions: many(quizQuestions),
 }));
 
 // Quiz Questions

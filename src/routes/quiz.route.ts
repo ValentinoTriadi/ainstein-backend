@@ -1,15 +1,18 @@
-import { createRoute, z } from '@hono/zod-openapi';
+import { createRoute } from '@hono/zod-openapi';
 
 import { createResponseSchema } from '@/lib';
 import { idParamsSchema } from '@/types/generic.type';
 import {
   createQuizSchema,
   listQuizSchema,
+  quizAnswerIdParamsSchema,
   quizQuestionIdParamsSchema,
   quizSchema,
+  updateQuizAnswerSchema,
   updateQuizQuestionSchema,
   updateQuizSchema,
 } from '@/types/quiz.type';
+import { studyKitIdParamsSchema } from '@/types/study-kit.type';
 
 export const createQuizRoute = createRoute({
   operationId: 'createQuiz',
@@ -41,8 +44,8 @@ export const getListQuizRoute = createRoute({
   operationId: 'getListQuiz',
   tags: ['quiz'],
   method: 'get',
-  path: '/quiz',
-  request: {},
+  path: '/study-kit/:id/quiz',
+  request: { params: studyKitIdParamsSchema },
   responses: {
     200: {
       description: 'List of All Quizzes',
@@ -128,10 +131,7 @@ export const updateQuizQuestionRoute = createRoute({
   method: 'put',
   path: '/quiz/:quizId/question/:questionId',
   request: {
-    params: z.object({
-      quizId: z.string(),
-      questionId: z.string(),
-    }),
+    params: quizQuestionIdParamsSchema,
     body: {
       content: {
         'application/json': {
@@ -163,6 +163,53 @@ export const deleteQuizQuestionRoute = createRoute({
   responses: {
     200: {
       description: 'Delete Quiz Question',
+      content: {
+        'application/json': {
+          schema: createResponseSchema(),
+        },
+      },
+    },
+  },
+});
+
+export const updateQuizAnswerRoute = createRoute({
+  operationId: 'updateQuizAnswer',
+  tags: ['quiz'],
+  method: 'put',
+  path: '/quiz/:quizId/question/:questionId/answer/:answerId',
+  request: {
+    params: quizAnswerIdParamsSchema,
+    body: {
+      content: {
+        'application/json': {
+          schema: updateQuizAnswerSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Update Quiz Answer',
+      content: {
+        'application/json': {
+          schema: createResponseSchema(),
+        },
+      },
+    },
+  },
+});
+
+export const deleteQuizAnswerRoute = createRoute({
+  operationId: 'deleteQuizAnswer',
+  tags: ['quiz'],
+  method: 'delete',
+  path: '/quiz/:quizId/question/:questionId/answer/:answerId',
+  request: {
+    params: quizAnswerIdParamsSchema,
+  },
+  responses: {
+    200: {
+      description: 'Delete Quiz Answer',
       content: {
         'application/json': {
           schema: createResponseSchema(),
