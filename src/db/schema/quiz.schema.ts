@@ -36,12 +36,16 @@ export const quizQuestions = pgTable('quiz_questions', {
   questionText: text('question_text').notNull(),
   questionType: varchar('question_type').notNull(),
 });
-export const quizQuestionsRelations = relations(quizQuestions, ({ one }) => ({
-  quiz: one(quizzes, {
-    fields: [quizQuestions.quizId],
-    references: [quizzes.id],
+export const quizQuestionsRelations = relations(
+  quizQuestions,
+  ({ one, many }) => ({
+    quiz: one(quizzes, {
+      fields: [quizQuestions.quizId],
+      references: [quizzes.id],
+    }),
+    quizAnswers: many(quizAnswers),
   }),
-}));
+);
 
 // Quiz Answers
 export const quizAnswers = pgTable('quiz_answers', {

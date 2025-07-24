@@ -13,6 +13,11 @@ const factory = createFactory<{
 
 export const authMiddleware = () => {
   return factory.createMiddleware(async (c, next) => {
+    // Skip authentication for /api/auth routes
+    if (c.req.url.includes('/api/auth/')) {
+      return next();
+    }
+
     const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
     if (!session) {
