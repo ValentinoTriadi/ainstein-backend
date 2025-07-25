@@ -1,6 +1,6 @@
 import { google } from '@ai-sdk/google';
 import { InvocationType } from '@aws-sdk/client-lambda';
-import { generateText } from 'ai';
+import { generateText, streamText } from 'ai';
 
 import { env } from '@/configs';
 import { db } from '@/db/drizzle';
@@ -151,7 +151,29 @@ Buatlah respon yang ringkas namun informatif.`;
       });
     }
 
-    // Generate AI response using the AI SDK
+    // Generate AI response using streaming
+    const streamResult = streamText({
+      model: google('gemini-2.5-flash'),
+      system: systemPrompt,
+      messages: [
+        ...messageHistory.slice(-10), // Keep last 10 messages for context
+        { role: 'user', content: userContent },
+      ],
+      temperature: 0.7,
+      maxTokens: 1000,
+      onFinish: async (result) => {
+        // Save the full response to history after streaming is complete
+        await addMessageToHistory(
+          db,
+          conversationId,
+          'assistant',
+          result.text,
+          user,
+        );
+      },
+    });
+
+    // For non-streaming, return the response as JSON
     const { text: aiResponse } = await generateText({
       model: google('gemini-2.5-flash'),
       system: systemPrompt,
@@ -197,6 +219,222 @@ Buatlah respon yang ringkas namun informatif.`;
         message: 'Failed to process message',
         error: error instanceof Error ? error.message : 'Unknown error',
         code: 500,
+      },
+      500,
+    );
+  }
+});
+
+// Streaming message endpoint (not bound by OpenAPI schema)
+conversationProtectedRouter.post('/conversation/:id/message/stream', async (c) => {
+  const conversationId = c.req.param('id');
+  const body = await c.req.json();
+  const user = c.var.user;
+
+  try {
+    const { message, image } = body;
+
+    // First, verify the conversation exists and belongs to the user
+    const conversationResult = await getConversation(db, conversationId, user);
+    if (!conversationResult.success || !conversationResult.data) {
+      return c.json(
+        conversationResult,
+        (conversationResult.code as unknown) ?? 400,
+      );
+    }
+
+    // Get conversation history for context
+    const historyResult = await getConversationHistory(
+      db,
+      conversationId,
+      user,
+    );
+    if (!historyResult.success || !historyResult.data) {
+      return c.json(historyResult, (historyResult.code as unknown) ?? 400);
+    }
+
+    // Add user message to history
+    const userMessageResult = await addMessageToHistory(
+      db,
+      conversationId,
+      'user',
+      message,
+      user,
+    );
+
+    if (!userMessageResult.success) {
+      return c.json(
+        userMessageResult,
+        (userMessageResult.code as unknown) ?? 400,
+      );
+    }
+
+    // Prepare conversation context for AI
+    const studyKit = conversationResult.data.studyKit;
+    const conversationHistory = historyResult.data;
+
+    // Build context from conversation history
+    const messageHistory = conversationHistory.map((msg) => ({
+      role: (msg.speaker === 'user' ? 'user' : 'assistant') as
+        | 'user'
+        | 'assistant',
+      content: msg.messageText,
+    }));
+
+    // Create system prompt based on study kit
+    const systemPrompt = `Kamu adalah tutor AI yang membantu siswa dengan materi belajar mereka: "${studyKit.title}".
+    
+Deskripsi Materi Belajar: ${studyKit.description || 'Tidak ada deskripsi yang disediakan'}
+
+Kamu harus:
+- Memberikan respon yang membantu dan edukatif terkait materi belajar
+- Mengajukan pertanyaan klarifikasi untuk lebih memahami kebutuhan siswa
+- Menawarkan penjelasan, contoh, dan panduan
+- Bersikap mendorong dan suportif
+- Tetap fokus pada konten edukasi
+- WAJIB merespons dalam Bahasa Indonesia
+
+Buatlah respon yang ringkas namun informatif.`;
+
+    // Prepare content for AI - support both text and images
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userContent: any[] = [{ type: 'text', text: message }];
+
+    // Add image if provided
+    if (image) {
+      // Convert base64 image to the format expected by Google AI
+      userContent.push({
+        type: 'image',
+        image: image, // base64 string
+      });
+    }
+
+    // Generate AI response using streaming
+    const streamResult = streamText({
+      model: google('gemini-2.5-flash'),
+      system: systemPrompt,
+      messages: [
+        ...messageHistory.slice(-10), // Keep last 10 messages for context
+        { role: 'user', content: userContent },
+      ],
+      temperature: 0.7,
+      maxTokens: 1000,
+      onFinish: async (result) => {
+        // Save the full response to history after streaming is complete
+        await addMessageToHistory(
+          db,
+          conversationId,
+          'assistant',
+          result.text,
+          user,
+        );
+      },
+    });
+
+    // Return AI SDK's streaming response
+    return streamResult.toDataStreamResponse();
+  } catch (error) {
+    console.error('Error in AI streaming conversation:', error);
+    return c.json(
+      {
+        success: false,
+        message: 'Failed to process message',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        code: 500,
+      },
+      500,
+    );
+  }
+});
+
+// AI SDK compatible chat endpoint
+conversationProtectedRouter.post('/conversation/:id/chat', async (c) => {
+  const conversationId = c.req.param('id');
+  const body = await c.req.json();
+  const user = c.var.user;
+
+  try {
+    const { messages } = body;
+    
+    if (!messages || !Array.isArray(messages)) {
+      return c.json({ error: 'Messages array is required' }, 400);
+    }
+
+    // Get the last user message
+    const lastMessage = messages[messages.length - 1];
+    if (!lastMessage || lastMessage.role !== 'user') {
+      return c.json({ error: 'Last message must be from user' }, 400);
+    }
+
+    // First, verify the conversation exists and belongs to the user
+    const conversationResult = await getConversation(db, conversationId, user);
+    if (!conversationResult.success || !conversationResult.data) {
+      return c.json(
+        { error: 'Conversation not found' },
+        400,
+      );
+    }
+
+    // Add user message to history
+    const userMessageResult = await addMessageToHistory(
+      db,
+      conversationId,
+      'user',
+      lastMessage.content,
+      user,
+    );
+
+    if (!userMessageResult.success) {
+      return c.json(
+        { error: 'Failed to save user message' },
+        400,
+      );
+    }
+
+    // Prepare conversation context for AI
+    const studyKit = conversationResult.data.studyKit;
+
+    // Create system prompt based on study kit
+    const systemPrompt = `Kamu adalah tutor AI yang membantu siswa dengan materi belajar mereka: "${studyKit.title}".
+    
+Deskripsi Materi Belajar: ${studyKit.description || 'Tidak ada deskripsi yang disediakan'}
+
+Kamu harus:
+- Memberikan respon yang membantu dan edukatif terkait materi belajar
+- Mengajukan pertanyaan klarifikasi untuk lebih memahami kebutuhan siswa
+- Menawarkan penjelasan, contoh, dan panduan
+- Bersikap mendorong dan suportif
+- Tetap fokus pada konten edukasi
+- WAJIB merespons dalam Bahasa Indonesia
+
+Buatlah respon yang ringkas namun informatif.`;
+
+    // Generate AI response using streaming
+    const streamResult = streamText({
+      model: google('gemini-2.5-flash'),
+      system: systemPrompt,
+      messages: messages.slice(-10), // Keep last 10 messages for context
+      temperature: 0.7,
+      maxTokens: 1000,
+      onFinish: async (result) => {
+        // Save the full response to history after streaming is complete
+        await addMessageToHistory(
+          db,
+          conversationId,
+          'assistant',
+          result.text,
+          user,
+        );
+      },
+    });
+
+    // Return AI SDK's streaming response
+    return streamResult.toDataStreamResponse();
+  } catch (error) {
+    console.error('Error in AI SDK chat:', error);
+    return c.json(
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       500,
     );
