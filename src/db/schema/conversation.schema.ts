@@ -2,8 +2,11 @@ import { relations } from 'drizzle-orm';
 import { pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 import { createId } from '../db-helper';
+import { flashcards } from './flashcard.schema';
+import { quizzes } from './quiz.schema';
 import { studyKits } from './study-kit.schema';
 import { user } from './user.schema';
+import { videos } from './video.schema';
 
 // Conversations
 export const conversations = pgTable('conversations', {
@@ -17,16 +20,22 @@ export const conversations = pgTable('conversations', {
   startedAt: timestamp('started_at').notNull().defaultNow(),
   lastUpdated: timestamp('last_updated').notNull().defaultNow(),
 });
-export const conversationsRelations = relations(conversations, ({ one }) => ({
-  studyKit: one(studyKits, {
-    fields: [conversations.studyKitId],
-    references: [studyKits.id],
+export const conversationsRelations = relations(
+  conversations,
+  ({ one, many }) => ({
+    studyKit: one(studyKits, {
+      fields: [conversations.studyKitId],
+      references: [studyKits.id],
+    }),
+    user: one(user, {
+      fields: [conversations.userId],
+      references: [user.id],
+    }),
+    videos: many(videos),
+    quizzes: many(quizzes),
+    flashcards: many(flashcards),
   }),
-  user: one(user, {
-    fields: [conversations.userId],
-    references: [user.id],
-  }),
-}));
+);
 
 // Conversation History
 export const conversationHistory = pgTable('conversation_history', {

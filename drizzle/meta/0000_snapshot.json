@@ -93,12 +93,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -168,12 +164,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -183,9 +175,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -283,12 +273,8 @@
           "name": "conversation_history_conversation_id_conversations_id_fk",
           "tableFrom": "conversation_history",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "conversation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["conversation_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -298,9 +284,7 @@
         "conversation_history_id_unique": {
           "name": "conversation_history_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -350,12 +334,8 @@
           "name": "conversations_study_kit_id_study_kits_id_fk",
           "tableFrom": "conversations",
           "tableTo": "study_kits",
-          "columnsFrom": [
-            "study_kit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["study_kit_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -363,12 +343,8 @@
           "name": "conversations_user_id_user_id_fk",
           "tableFrom": "conversations",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -378,9 +354,7 @@
         "conversations_id_unique": {
           "name": "conversations_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -429,12 +403,8 @@
           "name": "flashcards_study_kit_id_study_kits_id_fk",
           "tableFrom": "flashcards",
           "tableTo": "study_kits",
-          "columnsFrom": [
-            "study_kit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["study_kit_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -444,9 +414,7 @@
         "flashcards_id_unique": {
           "name": "flashcards_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -489,12 +457,8 @@
           "name": "quiz_answers_question_id_quiz_questions_id_fk",
           "tableFrom": "quiz_answers",
           "tableTo": "quiz_questions",
-          "columnsFrom": [
-            "question_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["question_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -504,9 +468,7 @@
         "quiz_answers_id_unique": {
           "name": "quiz_answers_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -548,12 +510,8 @@
           "name": "quiz_questions_quiz_id_quizzes_id_fk",
           "tableFrom": "quiz_questions",
           "tableTo": "quizzes",
-          "columnsFrom": [
-            "quiz_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["quiz_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -563,9 +521,7 @@
         "quiz_questions_id_unique": {
           "name": "quiz_questions_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -614,12 +570,8 @@
           "name": "quizzes_study_kit_id_study_kits_id_fk",
           "tableFrom": "quizzes",
           "tableTo": "study_kits",
-          "columnsFrom": [
-            "study_kit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["study_kit_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -629,9 +581,7 @@
         "quizzes_id_unique": {
           "name": "quizzes_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -680,12 +630,8 @@
           "name": "study_kit_groups_user_id_user_id_fk",
           "tableFrom": "study_kit_groups",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -695,9 +641,7 @@
         "study_kit_groups_id_unique": {
           "name": "study_kit_groups_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -759,12 +703,8 @@
           "name": "study_kits_group_id_study_kit_groups_id_fk",
           "tableFrom": "study_kits",
           "tableTo": "study_kit_groups",
-          "columnsFrom": [
-            "group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -772,12 +712,8 @@
           "name": "study_kits_user_id_user_id_fk",
           "tableFrom": "study_kits",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -785,19 +721,14 @@
       "compositePrimaryKeys": {
         "study_kits_id_group_id_pk": {
           "name": "study_kits_id_group_id_pk",
-          "columns": [
-            "id",
-            "group_id"
-          ]
+          "columns": ["id", "group_id"]
         }
       },
       "uniqueConstraints": {
         "study_kits_id_unique": {
           "name": "study_kits_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -864,16 +795,12 @@
         "user_id_unique": {
           "name": "user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         },
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -910,12 +837,8 @@
           "name": "video_likes_video_id_videos_id_fk",
           "tableFrom": "video_likes",
           "tableTo": "videos",
-          "columnsFrom": [
-            "video_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["video_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -923,12 +846,8 @@
           "name": "video_likes_user_id_user_id_fk",
           "tableFrom": "video_likes",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -936,20 +855,14 @@
       "compositePrimaryKeys": {
         "video_likes_video_id_user_id_pk": {
           "name": "video_likes_video_id_user_id_pk",
-          "columns": [
-            "video_id",
-            "user_id"
-          ]
+          "columns": ["video_id", "user_id"]
         }
       },
       "uniqueConstraints": {
         "video_likes_video_id_user_id_unique": {
           "name": "video_likes_video_id_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "video_id",
-            "user_id"
-          ]
+          "columns": ["video_id", "user_id"]
         }
       },
       "policies": {},
@@ -1023,12 +936,8 @@
           "name": "videos_study_kit_id_study_kits_id_fk",
           "tableFrom": "videos",
           "tableTo": "study_kits",
-          "columnsFrom": [
-            "study_kit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["study_kit_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1036,12 +945,8 @@
           "name": "videos_user_id_user_id_fk",
           "tableFrom": "videos",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1051,9 +956,7 @@
         "videos_id_unique": {
           "name": "videos_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -1095,12 +998,8 @@
           "name": "videos_comments_video_id_videos_id_fk",
           "tableFrom": "videos_comments",
           "tableTo": "videos",
-          "columnsFrom": [
-            "video_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["video_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1108,12 +1007,8 @@
           "name": "videos_comments_user_id_user_id_fk",
           "tableFrom": "videos_comments",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1123,17 +1018,12 @@
         "videos_comments_id_unique": {
           "name": "videos_comments_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         },
         "videos_comments_video_id_user_id_unique": {
           "name": "videos_comments_video_id_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "video_id",
-            "user_id"
-          ]
+          "columns": ["video_id", "user_id"]
         }
       },
       "policies": {},

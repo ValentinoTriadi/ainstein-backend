@@ -1,4 +1,5 @@
 import { and, eq } from 'drizzle-orm';
+
 import { firstSure } from '@/db/db-helper';
 import { Database } from '@/db/drizzle';
 import { quizAnswers, quizQuestions, quizzes, studyKits } from '@/db/schema';
@@ -70,7 +71,7 @@ export const createQuizFromAI = async (
               questionId: newQuestion.id,
               answerText: answer.answerText,
               isCorrect: answer.isCorrect,
-            }))
+            })),
           );
         }
       }
