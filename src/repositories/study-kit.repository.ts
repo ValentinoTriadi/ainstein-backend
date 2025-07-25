@@ -18,7 +18,7 @@ export const createStudyKit = async (
   user: SessionUser,
 ) => {
   try {
-    const { groupId, title, description } = body;
+    const { groupId, title, description, imageUrl } = body;
     const { id: userId } = user;
 
     // find group to ensure it exists
@@ -45,6 +45,7 @@ export const createStudyKit = async (
         groupId,
         title,
         description,
+        imageUrl,
       })
       .returning()
       .then(first);
