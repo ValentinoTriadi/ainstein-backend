@@ -38,6 +38,7 @@ export const lastMessageSchema = z.object({
 export const studyKitWithLastMessageSchema = studyKitSchema.extend({
   imageUrl: z.string().url().nullable(),
   lastMessage: lastMessageSchema,
+  conversationId: z.string(),
 });
 
 export const listStudyKitWithLastMessageSchema = z.array(studyKitWithLastMessageSchema);

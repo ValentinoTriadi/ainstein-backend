@@ -9,6 +9,7 @@ import {
 } from "@/db/schema/conversation.schema";
 import { SessionUser } from "@/types/session.type";
 import { CreateStudyKit, UpdateStudyKit } from "@/types/study-kit.type";
+import { createConversation } from "./conversation.repository";
 
 export const createStudyKit = async (
 	db: Database,
@@ -218,16 +219,27 @@ export const getStudyKitsWithLastMessage = async (
 		// For each kit, get its conversation and last message
 		const results = await Promise.all(
 			kits.map(async (kit) => {
-				// Find the conversation for this study kit
-				const conversation = await db.query.conversations.findFirst({
+				// Find all conversations for this study kit, order by startedAt ascending
+				const conversationsList = await db.query.conversations.findMany({
 					where: and(
 						eq(conversations.studyKitId, kit.id),
 						eq(conversations.userId, user.id),
 					),
+					orderBy: (conversations, { asc }) => [asc(conversations.startedAt)],
 				});
+				let conversation = conversationsList[0] || null;
+				// If no conversation, create one
+				if (!conversation) {
+					const createRes = await createConversation(db, { studyKitId: kit.id }, user);
+					if (createRes.success && createRes.data) {
+						conversation = createRes.data;
+					} else {
+						throw new Error('Failed to create conversation for study kit ' + kit.id);
+					}
+				}
+				// Get the last message in the conversation
 				let lastMessage = null;
 				if (conversation) {
-					// Get the last message in the conversation
 					lastMessage = await db.query.conversationHistory.findFirst({
 						where: eq(conversationHistory.conversationId, conversation.id),
 						orderBy: (conversationHistory, { desc }) => [
@@ -238,14 +250,15 @@ export const getStudyKitsWithLastMessage = async (
 				return {
 					id: kit.id,
 					title: kit.title,
-					imageUrl: "imageUrl" in kit ? kit.imageUrl : null,
+					imageUrl: 'imageUrl' in kit ? kit.imageUrl : null,
 					lastMessage: lastMessage
 						? {
-								speaker: lastMessage.speaker,
-								messageText: lastMessage.messageText,
-								timestamp: lastMessage.timestamp,
-							}
+							  speaker: lastMessage.speaker,
+							  messageText: lastMessage.messageText,
+							  timestamp: lastMessage.timestamp,
+						  }
 						: null,
+					conversationId: conversation.id,
 				};
 			}),
 		);
