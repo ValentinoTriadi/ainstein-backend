@@ -510,17 +510,17 @@ conversationProtectedRouter.openapi(generateVideoRoute, async (c) => {
 
     console.log('Lambda response:', payload);
 
-    // if (payload.statusCode !== 200) {
-    //   return c.json(
-    //     {
-    //       success: false,
-    //       message: 'Lambda function failed',
-    //       error: payload.errorMessage || 'Unknown lambda error',
-    //       code: payload.statusCode,
-    //     },
-    //     500,
-    //   );
-    // }
+    if (payload.statusCode !== 200) {
+      return c.json(
+        {
+          success: false,
+          message: 'Lambda function failed',
+          error: payload || 'Unknown lambda error',
+          code: payload.statusCode,
+        },
+        500,
+      );
+    }
 
     // Save video in database
     const videoData = {
