@@ -138,12 +138,12 @@ export const updateStudyKit = async (
   user: SessionUser,
 ) => {
   try {
-    const { title, groupId, description } = body;
+    const { title, groupId, description, imageUrl } = body;
     const { id: userId } = user;
 
     const result = await db
       .update(studyKits)
-      .set({ title, groupId, description })
+      .set({ title, groupId, description, imageUrl })
       .where(and(eq(studyKits.id, kitId), eq(studyKits.userId, userId)))
       .returning()
       .then(first);
