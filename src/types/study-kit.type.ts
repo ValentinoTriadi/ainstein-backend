@@ -27,3 +27,19 @@ export const studyKitIdParamsSchema = z.object({ id: z.string() });
 export type StudyKit = z.infer<typeof studyKitSchema>;
 export type CreateStudyKit = z.infer<typeof createStudyKitSchema>;
 export type UpdateStudyKit = z.infer<typeof updateStudyKitSchema>;
+
+// New: StudyKitWithLastMessage schema
+export const lastMessageSchema = z.object({
+  speaker: z.string(),
+  messageText: z.string(),
+  timestamp: z.union([z.string(), z.date()]),
+}).nullable();
+
+export const studyKitWithLastMessageSchema = studyKitSchema.extend({
+  imageUrl: z.string().url().nullable(),
+  lastMessage: lastMessageSchema,
+});
+
+export const listStudyKitWithLastMessageSchema = z.array(studyKitWithLastMessageSchema);
+
+export type StudyKitWithLastMessage = z.infer<typeof studyKitWithLastMessageSchema>;

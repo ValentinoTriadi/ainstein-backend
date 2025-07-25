@@ -146,7 +146,7 @@ Buatlah respon yang ringkas namun informatif.`;
 
 		// Generate AI response using the AI SDK
 		const { text: aiResponse } = await generateText({
-			model: google("gemini-2.0-flash"),
+			model: google("gemini-2.5-flash"),
 			system: systemPrompt,
 			messages: [
 				...messageHistory.slice(-10), // Keep last 10 messages for context

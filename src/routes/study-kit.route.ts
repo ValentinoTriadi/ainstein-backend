@@ -8,6 +8,8 @@ import {
   studyKitIdParamsSchema,
   studyKitSchema,
   updateStudyKitSchema,
+  studyKitWithLastMessageSchema,
+  listStudyKitWithLastMessageSchema,
 } from '@/types/study-kit.type';
 
 export const createStudyKitRoute = createRoute({
@@ -135,6 +137,24 @@ export const deleteStudyKitRoute = createRoute({
       content: {
         'application/json': {
           schema: createResponseSchema(),
+        },
+      },
+    },
+  },
+});
+
+export const getStudyKitsWithLastMessageRoute = createRoute({
+  operationId: 'getStudyKitsWithLastMessage',
+  tags: ['study-kit'],
+  method: 'get',
+  path: '/study-kit/with-last-message',
+  request: {},
+  responses: {
+    200: {
+      description: 'List of Study Kits with last message',
+      content: {
+        'application/json': {
+          schema: createResponseSchema(listStudyKitWithLastMessageSchema),
         },
       },
     },

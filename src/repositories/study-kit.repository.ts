@@ -3,6 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { first } from '@/db/db-helper';
 import { Database } from '@/db/drizzle';
 import { studyKitGroups, studyKits } from '@/db/schema';
+import { conversations, conversationHistory } from '@/db/schema/conversation.schema';
 import { SessionUser } from '@/types/session.type';
 import { CreateStudyKit, UpdateStudyKit } from '@/types/study-kit.type';
 
@@ -187,6 +188,62 @@ export const deleteStudyKit = async (
     return {
       success: false,
       message: 'Failed to delete Study Kit',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: 500,
+    };
+  }
+};
+
+export const getStudyKitsWithLastMessage = async (db: Database, user: SessionUser) => {
+  try {
+    // Get all study kits for the user
+    const kits = await db.select().from(studyKits).where(eq(studyKits.userId, user.id));
+    if (!kits.length) {
+      return {
+        success: true,
+        message: 'No study kits found',
+        data: [],
+        code: 200,
+      };
+    }
+    // For each kit, get its conversation and last message
+    const results = await Promise.all(kits.map(async (kit) => {
+      // Find the conversation for this study kit
+      const conversation = await db.query.conversations.findFirst({
+        where: and(eq(conversations.studyKitId, kit.id), eq(conversations.userId, user.id)),
+      });
+      let lastMessage = null;
+      if (conversation) {
+        // Get the last message in the conversation
+        lastMessage = await db.query.conversationHistory.findFirst({
+          where: eq(conversationHistory.conversationId, conversation.id),
+          orderBy: (conversationHistory, { desc }) => [desc(conversationHistory.timestamp)],
+        });
+      }
+      return {
+        id: kit.id,
+        title: kit.title,
+        imageUrl: 'imageUrl' in kit ? kit.imageUrl : null,
+        lastMessage: lastMessage
+          ? {
+              speaker: lastMessage.speaker,
+              messageText: lastMessage.messageText,
+              timestamp: lastMessage.timestamp,
+            }
+          : null,
+      };
+    }));
+    return {
+      success: true,
+      message: 'Study Kits with last message fetched successfully',
+      data: results,
+      code: 200,
+    };
+  } catch (error) {
+    console.error('Error fetching Study Kits with last message:', error);
+    return {
+      success: false,
+      message: 'Failed to fetch Study Kits with last message',
       error: error instanceof Error ? error.message : 'Unknown error',
       code: 500,
     };

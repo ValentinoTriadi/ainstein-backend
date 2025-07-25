@@ -6,6 +6,7 @@ import {
   getListStudyKit,
   getStudyKit,
   updateStudyKit,
+  getStudyKitsWithLastMessage,
 } from '@/repositories/study-kit.repository';
 import {
   createStudyKitRoute,
@@ -13,6 +14,7 @@ import {
   getListStudyKitRoute,
   getStudyKitRoute,
   updateStudyKitRoute,
+  getStudyKitsWithLastMessageRoute,
 } from '@/routes/study-kit.route';
 
 export const studyKitProtectedRouter = createAuthRouter();
@@ -49,5 +51,11 @@ studyKitProtectedRouter.openapi(deleteStudyKitRoute, async (c) => {
   const params = c.req.valid('param');
   const user = c.var.user;
   const res = await deleteStudyKit(db, params.id, user);
+  return c.json(res, (res.code as unknown) ?? 200);
+});
+
+studyKitProtectedRouter.openapi(getStudyKitsWithLastMessageRoute, async (c) => {
+  const user = c.var.user;
+  const res = await getStudyKitsWithLastMessage(db, user);
   return c.json(res, (res.code as unknown) ?? 200);
 });

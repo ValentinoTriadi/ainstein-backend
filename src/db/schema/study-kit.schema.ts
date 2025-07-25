@@ -41,6 +41,7 @@ export const studyKits = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
     title: varchar('title').notNull(),
     description: text('description'),
+    imageUrl: varchar('image_url', { length: 255 }),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
