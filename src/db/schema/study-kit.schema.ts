@@ -8,7 +8,10 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { createId } from '../db-helper';
+import { flashcards } from './flashcard.schema';
+import { quizzes } from './quiz.schema';
 import { user } from './user.schema';
+import { videos } from './video.schema';
 
 // Study Kit Groups
 export const studyKitGroups = pgTable('study_kit_groups', {
@@ -50,7 +53,7 @@ export const studyKits = pgTable(
   }),
 );
 
-export const studyKitsRelations = relations(studyKits, ({ one }) => ({
+export const studyKitsRelations = relations(studyKits, ({ one, many }) => ({
   group: one(studyKitGroups, {
     fields: [studyKits.groupId],
     references: [studyKitGroups.id],
@@ -59,6 +62,9 @@ export const studyKitsRelations = relations(studyKits, ({ one }) => ({
     fields: [studyKits.userId],
     references: [user.id],
   }),
+  videos: many(videos),
+  quizzes: many(quizzes),
+  flashcards: many(flashcards),
 }));
 
 // Types

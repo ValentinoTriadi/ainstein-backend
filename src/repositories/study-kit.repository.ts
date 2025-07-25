@@ -91,11 +91,14 @@ export const getStudyKit = async (
   user: SessionUser,
 ) => {
   try {
-    const kit = await db
-      .select()
-      .from(studyKits)
-      .where(and(eq(studyKits.id, kitId), eq(studyKits.userId, user.id)))
-      .then(first);
+    const kit = await db.query.studyKits.findFirst({
+      where: and(eq(studyKits.id, kitId), eq(studyKits.userId, user.id)),
+      with: {
+        quizzes: true,
+        videos: true,
+        flashcards: true,
+      },
+    });
 
     if (!kit) {
       return {
