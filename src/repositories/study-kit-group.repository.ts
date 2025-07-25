@@ -17,15 +17,20 @@ export const createStudyKitGroup = async (
   try {
     const { name, description } = body;
     const { id: userId } = user;
-    await db.insert(studyKitGroups).values({
-      userId,
-      name,
-      description,
-    });
+    const res = await db
+      .insert(studyKitGroups)
+      .values({
+        userId,
+        name,
+        description,
+      })
+      .returning()
+      .then(first);
 
     return {
       success: true,
       message: 'Study Kit Group created successfully',
+      data: res,
       code: 201,
     };
   } catch (error) {
