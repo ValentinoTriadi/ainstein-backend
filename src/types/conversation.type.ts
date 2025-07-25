@@ -96,6 +96,12 @@ export const generateVideoSchema = z
       .describe(
         'Specific topic for the video (optional, will use conversation context if not provided)',
       ),
+    prompt: z
+      .string()
+      .optional()
+      .describe(
+        'Prompt for the video (optional, will use conversation context if not provided)',
+      ),
     length: z
       .number()
       .min(1)

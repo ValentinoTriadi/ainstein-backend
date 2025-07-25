@@ -430,7 +430,7 @@ conversationProtectedRouter.openapi(generateVideoRoute, async (c) => {
   const user = c.var.user;
 
   try {
-    const { topic, length } = body;
+    const { topic, length, prompt } = body;
     const conversationId = params.id;
 
     // Get conversation and history for context
@@ -466,15 +466,22 @@ conversationProtectedRouter.openapi(generateVideoRoute, async (c) => {
     const { text: aiResponse } = await generateText({
       model: google('gemini-2.0-flash'),
       messages: [
-        { role: 'user', content: videoPrompt },
         { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: videoPrompt },
+        {
+          role: 'user',
+          content:
+            prompt ||
+            `Buatkan video edukasi tentang materi ini dalam bahasa Indonesia.`,
+        },
       ],
       temperature: 0.2,
-      maxTokens: 2000,
     });
 
     // Extract Python code from AI response
     const generatedCode = extractPythonCode(aiResponse);
+
+    console.log(generatedCode);
 
     if (!generatedCode) {
       return c.json(
@@ -489,7 +496,7 @@ conversationProtectedRouter.openapi(generateVideoRoute, async (c) => {
 
     // Call Lambda to generate video
     const paramsLambda = {
-      FunctionName: env.LAMBDA_FUNCTION_NAME || 'manim-video-generator',
+      FunctionName: env.LAMBDA_FUNCTION_NAME,
       InvocationType: InvocationType.RequestResponse,
       Payload: JSON.stringify({
         body: JSON.stringify({ code: generatedCode }),
