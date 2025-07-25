@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { studyKits } from '@/db/schema';
 
+import { flashcardSchema } from './flashcard.type';
 import { quizSchema } from './quiz.type';
 import { videoSchema } from './video.type';
 
