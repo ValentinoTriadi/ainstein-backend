@@ -38,16 +38,21 @@ export const createStudyKit = async (
       };
     }
 
-    await db.insert(studyKits).values({
-      userId,
-      groupId,
-      title,
-      description,
-    });
+    const res = await db
+      .insert(studyKits)
+      .values({
+        userId,
+        groupId,
+        title,
+        description,
+      })
+      .returning()
+      .then(first);
 
     return {
       success: true,
       message: 'Study Kit created successfully',
+      data: res,
       code: 201,
     };
   } catch (error) {
