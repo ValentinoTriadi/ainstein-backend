@@ -24,6 +24,7 @@ export const videos = pgTable('videos', {
     .references(() => user.id, { onDelete: 'cascade' }),
   title: varchar('title').notNull(),
   url: varchar('url').notNull(),
+  thumbnailUrl: varchar('thumbnail_url').notNull().default(''),
   description: text('description'),
   like: integer('like').default(0),
   uploadedAt: timestamp('uploaded_at').notNull().defaultNow(),

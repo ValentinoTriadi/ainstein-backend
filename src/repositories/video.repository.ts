@@ -41,10 +41,21 @@ export const createVideo = async (
       studyKitId,
     });
 
+    // Fetch the created video to get its ID
+    const createdVideo = await db.query.videos.findFirst({
+      where: and(
+        eq(videos.userId, userId),
+        eq(videos.title, title),
+        eq(videos.url, url),
+      ),
+      orderBy: [sql`${videos.uploadedAt} DESC`],
+    });
+
     return {
       success: true,
       message: 'Video created successfully',
       code: 201,
+      videoId: createdVideo?.id || null,
     };
   } catch (error) {
     console.error('Error creating Video:', error);
